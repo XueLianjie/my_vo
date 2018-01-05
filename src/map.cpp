@@ -21,6 +21,11 @@
 
 namespace myslam
 {
+/*
+Map::Map():global_map_(nullptr), resolution_(0.04)
+{
+    
+}*/
 
 void Map::insertKeyFrame ( Frame::Ptr frame )
 {
@@ -47,5 +52,19 @@ void Map::insertMapPoint ( MapPoint::Ptr map_point )
     }
 }
 
+void Map::updateGlobalMap( Frame::Ptr frame )
+{
+    //global_map_ = boost::make_shared< pcl::PointCloud<pcl::PointXYZRGB> >( );
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr tmp(new pcl::PointCloud<pcl::PointXYZRGB> );
+    //pcl::transformPointCloud( *(frame->point_cloud_), *tmp, frame->T_c_w_.inverse().matrix() );
+    tmp->is_dense = false;
+    *global_map_ += *tmp;
+    voxel_.setLeafSize( resolution_, resolution_, resolution_);
+    voxel_.setInputCloud( global_map_ );
+    voxel_.filter( *tmp );
+    global_map_->swap( *tmp );
+   // viewer_.showCloud( global_map_ );
+    
+}
 
 }

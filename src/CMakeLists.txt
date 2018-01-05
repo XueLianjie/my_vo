@@ -1,4 +1,4 @@
-add_library( myslam SHARED
+add_library( myslam
     frame.cpp
     mappoint.cpp
     map.cpp

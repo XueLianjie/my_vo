@@ -11,7 +11,8 @@ set( LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib )
 
 ############### dependencies ######################
 # pcl 
-find_package( PCL REQUIRED COMPONENT common io )
+find_package( PCL REQUIRED)
+add_definitions(${PCL_DEFINITIONS})
 include_directories( ${PCL_INCLUDE_DIRS} )
 add_definitions( ${PCL_DEFINITIONS} )
 

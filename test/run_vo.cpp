@@ -20,6 +20,8 @@ int main ( int argc, char** argv )
     myslam::Config::setParameterFile ( argv[1] );
     myslam::VisualOdometry::Ptr vo ( new myslam::VisualOdometry );
 
+    pcl::visualization::CloudViewer viewer("viewer");
+
     string dataset_dir = myslam::Config::get<string> ( "dataset_dir" );
     cout<<"dataset: "<<dataset_dir<<endl;
     ifstream fin ( dataset_dir+"/associate.txt" );
@@ -47,6 +49,7 @@ int main ( int argc, char** argv )
     myslam::Camera::Ptr camera ( new myslam::Camera );
 
     // visualization
+/******************Xue******************
     cv::viz::Viz3d vis ( "Visual Odometry" );
     cv::viz::WCoordinateSystem world_coor ( 1.0 ), camera_coor ( 0.5 );
     cv::Point3d cam_pos ( 0, -1.0, -1.0 ), cam_focal_point ( 0,0,0 ), cam_y_dir ( 0,1,0 );
@@ -57,9 +60,11 @@ int main ( int argc, char** argv )
     camera_coor.setRenderingProperty ( cv::viz::LINE_WIDTH, 1.0 );
     vis.showWidget ( "World", world_coor );
     vis.showWidget ( "Camera", camera_coor );
+/******************Xue******************/
 
     cout<<"read total "<<rgb_files.size() <<" entries"<<endl;
     for ( int i=0; i<rgb_files.size(); i++ )
+    //for ( int i=0; i<280; i++ )
     {
         cout<<"****** loop "<<i<<" ******"<<endl;
         Mat color = cv::imread ( rgb_files[i] );
@@ -74,13 +79,17 @@ int main ( int argc, char** argv )
 
         boost::timer timer;
         vo->addFrame ( pFrame );
-        cout<<"VO costs time: "<<timer.elapsed() <<endl;
+        //cout<<"VO costs time: "<<timer.elapsed() <<endl;
 
         if ( vo->state_ == myslam::VisualOdometry::LOST )
             break;
         SE3 Twc = pFrame->T_c_w_.inverse();
-
+        
+	/******************Xue******************/
+	viewer.showCloud(vo->map_->global_map_);
+	/******************Xue******************/
         // show the map and the camera pose
+/******************Xue******************
         cv::Affine3d M (
             cv::Affine3d::Mat3 (
                 Twc.rotation_matrix() ( 0,0 ), Twc.rotation_matrix() ( 0,1 ), Twc.rotation_matrix() ( 0,2 ),
@@ -105,7 +114,10 @@ int main ( int argc, char** argv )
         vis.setWidgetPose ( "Camera", M );
         vis.spinOnce ( 1, false );
         cout<<endl;
+/******************Xue******************/
     }
-
+    int a;
+    //viewer.showCloud(vo->map_->global_map_);
+    std::cin >> a;
     return 0;
 }

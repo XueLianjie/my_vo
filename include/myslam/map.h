@@ -32,11 +32,23 @@ public:
     typedef shared_ptr<Map> Ptr;
     unordered_map<unsigned long, MapPoint::Ptr >  map_points_;        // all landmarks
     unordered_map<unsigned long, Frame::Ptr >     keyframes_;         // all key-frames
+/******************Xue******************/
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr global_map_=nullptr;
+//    pcl::visualization::CloudViewer viewer_;
+    pcl::VoxelGrid<pcl::PointXYZRGB> voxel_;
+    double resolution_=0.01;
 
-    Map() {}
+/******************Xue******************/
+    Map(){}; 
     
     void insertKeyFrame( Frame::Ptr frame );
     void insertMapPoint( MapPoint::Ptr map_point );
+/******************Xue******************/
+    void updateGlobalMap( Frame::Ptr frame );
+
+/******************Xue******************/
+//   void viewerMap(); 
+
 };
 }
 

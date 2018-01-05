@@ -23,13 +23,6 @@
 #include "myslam/common_include.h"
 #include "myslam/camera.h"
 
-/******************Xue******************/
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h> 
-#include <pcl/io/pcd_io.h> 
-//#include <pcl/visualization/pcl_visualizer.h>
-/******************Xue******************/
-
 namespace myslam 
 {
     
@@ -49,7 +42,7 @@ public:
     bool                           is_key_frame_;  // whether a key-frame
 
 /******************Xue******************/
-   pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_;
 /******************Xue******************/
 
 public: // data members 
@@ -71,7 +64,7 @@ public: // data members
     bool isInFrame( const Vector3d& pt_world );
 
 /******************Xue******************/
-    void createPointCloud();
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr createPointCloud();
 /******************Xue******************/
 };
 

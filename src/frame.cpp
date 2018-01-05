@@ -22,7 +22,7 @@
 namespace myslam
 {
 Frame::Frame()
-: id_(-1), time_stamp_(-1), camera_(nullptr), is_key_frame_(false), point_cloud_(nullptr)
+: id_(-1), time_stamp_(-1), camera_(nullptr), is_key_frame_(false), point_cloud_(new pcl::PointCloud<pcl::PointXYZRGB>())
 {
 
 }
@@ -94,13 +94,15 @@ bool Frame::isInFrame ( const Vector3d& pt_world )
 }
 
 /******************Xue******************/
-void Frame::createPointCloud()
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr Frame::createPointCloud()//必须得返回指针才行，不然会出错。
 {
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr tmp( new pcl::PointCloud<pcl::PointXYZRGB>() );
     for ( int v=0; v<color_.rows; v++ )
+    {	 
         for ( int u=0; u<color_.cols; u++ )
         {
             unsigned int d = depth_.ptr<unsigned short> ( v )[u]; // 深度值
-            if ( d==0 ) continue; // 为0表示没有测量到
+            if ( d <= 500 || d > 15000) continue; // 为0表示没有测量到, 500/5000m - 15000/5000m表示
             Eigen::Vector3d point; 
             point[2] = double(d)/camera_->depth_scale_; 
             point[0] = (u-camera_->cx_)*point[2]/camera_->fx_;
@@ -109,15 +111,16 @@ void Frame::createPointCloud()
             
             pcl::PointXYZRGB p ;
             p.x = pointWorld[0];
-            p.y = pointWorld[1];
-            p.z = pointWorld[2];
+            p.y = -pointWorld[1];
+            p.z = -pointWorld[2];
             p.b = color_.data[ v*color_.step+u*color_.channels() ];
             p.g = color_.data[ v*color_.step+u*color_.channels()+1 ];
             p.r = color_.data[ v*color_.step+u*color_.channels()+2 ];
-            point_cloud_->points.push_back( p );
+            tmp->points.push_back( p );
         }    
-
+    }
+    return tmp;
 }
-/******************Xue******************/
+
 
 }

@@ -62,6 +62,13 @@ bool VisualOdometry::addFrame ( Frame::Ptr frame )
         extractKeyPoints();
         computeDescriptors();
         addKeyFrame();      // the first frame is a key-frame
+/******************Xue******************/
+	 
+		map_->global_map_ = curr_->createPointCloud();
+ 		cout << "create Point Cloud" << endl;	
+		//map_->updateGlobalMap(curr_);
+		cout << "update Point Cloud" << endl;
+/******************Xue******************/
         break;
     }
     case OK:
@@ -79,6 +86,23 @@ bool VisualOdometry::addFrame ( Frame::Ptr frame )
             num_lost_ = 0;
             if ( checkKeyFrame() == true ) // is a key-frame
             {
+/******************Xue******************/
+		    //map_->global_map_ = boost::make_shared< pcl::PointCloud<pcl::PointXYZRGB> >( );
+		    pcl::PointCloud<pcl::PointXYZRGB>::Ptr tmp(new pcl::PointCloud<pcl::PointXYZRGB> ), tmp2(new pcl::PointCloud<pcl::PointXYZRGB> );
+
+                    cout << "************" << endl;
+		    tmp = curr_->createPointCloud();
+		    //pcl::transformPointCloud( *tmp, *tmp2, curr_->T_c_w_.inverse().matrix() );
+		    tmp->is_dense = false;
+		    *(map_->global_map_) += *tmp;
+		    //map_->global_map_ = tmp;
+		    map_->voxel_.setLeafSize( map_->resolution_, map_->resolution_, map_->resolution_);
+		    map_->voxel_.setInputCloud( map_->global_map_ );
+		    map_->voxel_.filter( *tmp );
+		    //map_->global_map_ = tmp;
+		    map_->global_map_->swap( *tmp );
+		   // viewer_.showCloud( global_map_ );
+/******************Xue******************/
                 addKeyFrame();
             }
         }
@@ -107,14 +131,14 @@ void VisualOdometry::extractKeyPoints()
 {
     boost::timer timer;
     orb_->detect ( curr_->color_, keypoints_curr_ );
-    cout<<"extract keypoints cost time: "<<timer.elapsed() <<endl;
+    //cout<<"extract keypoints cost time: "<<timer.elapsed() <<endl;
 }
 
 void VisualOdometry::computeDescriptors()
 {
     boost::timer timer;
     orb_->compute ( curr_->color_, keypoints_curr_, descriptors_curr_ );
-    cout<<"descriptor computation cost time: "<<timer.elapsed() <<endl;
+    //cout<<"descriptor computation cost time: "<<timer.elapsed() <<endl;
 }
 
 void VisualOdometry::featureMatching()
@@ -156,8 +180,8 @@ void VisualOdometry::featureMatching()
             match_2dkp_index_.push_back( m.trainIdx );
         }
     }
-    cout<<"good matches: "<<match_3dpts_.size() <<endl;
-    cout<<"match cost time: "<<timer.elapsed() <<endl;
+    //cout<<"good matches: "<<match_3dpts_.size() <<endl;
+    //cout<<"match cost time: "<<timer.elapsed() <<endl;
 }
 
 void VisualOdometry::poseEstimationPnP()
@@ -183,7 +207,7 @@ void VisualOdometry::poseEstimationPnP()
     Mat rvec, tvec, inliers;
     cv::solvePnPRansac ( pts3d, pts2d, K, Mat(), rvec, tvec, false, 100, 4.0, 0.99, inliers );
     num_inliers_ = inliers.rows;
-    cout<<"pnp inliers: "<<num_inliers_<<endl;
+    //cout<<"pnp inliers: "<<num_inliers_<<endl;
     T_c_w_estimated_ = SE3 (
                            SO3 ( rvec.at<double> ( 0,0 ), rvec.at<double> ( 1,0 ), rvec.at<double> ( 2,0 ) ),
                            Vector3d ( tvec.at<double> ( 0,0 ), tvec.at<double> ( 1,0 ), tvec.at<double> ( 2,0 ) )
@@ -229,7 +253,7 @@ void VisualOdometry::poseEstimationPnP()
         pose->estimate().translation()
     );
     
-    cout<<"T_c_w_estimated_: "<<endl<<T_c_w_estimated_.matrix()<<endl;
+    //cout<<"T_c_w_estimated_: "<<endl<<T_c_w_estimated_.matrix()<<endl;
 }
 
 bool VisualOdometry::checkEstimatedPose()
@@ -353,7 +377,7 @@ void VisualOdometry::optimizeMap()
     }
     else 
         map_point_erase_ratio_ = 0.1;
-    cout<<"map points: "<<map_->map_points_.size()<<endl;
+    //cout<<"map points: "<<map_->map_points_.size()<<endl;
 }
 
 double VisualOdometry::getViewAngle ( Frame::Ptr frame, MapPoint::Ptr point )

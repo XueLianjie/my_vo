@@ -47,6 +47,15 @@ using cv::Mat;
 #include <set>
 #include <unordered_map>
 #include <map>
+/******************Xue******************/
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h> 
+#include <pcl/io/pcd_io.h> 
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/common/transforms.h>
 
+#include <pcl/visualization/cloud_viewer.h>
+/******************Xue******************/
 using namespace std; 
 #endif
